@@ -20,6 +20,9 @@ async function run() {
     try {
         const categoryCollection = client.db('mobileHaat').collection('categories')
         const productsCollection = client.db('mobileHaat').collection('products')
+        const bookingsCollection = client.db('mobileHaat').collection('bookings')
+        const usersCollection = client.db('mobileHaat').collection('users')
+        const paymentsCollection = client.db('mobileHaat').collection('payments')
 
         app.get('/categories', async (req, res) => {
             const query = {}
@@ -38,6 +41,13 @@ async function run() {
 
             const matchedProducts = products.filter(n => n.category_id == id);
             res.send(matchedProducts);
+        })
+
+        app.post('/users', async (req, res) => {
+            const user = req.body
+            console.log(user);
+            const result = await usersCollection.insertOne(user)
+            res.send(result)
         })
 
 
