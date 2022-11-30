@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 const port = process.env.PORT || 5000;
@@ -43,11 +43,25 @@ async function run() {
             res.send(matchedProducts);
         })
 
+        app.get('/users', async (req, res) => {
+            const query = {}
+            const users = await usersCollection.find(query).toArray()
+            res.send(users)
+        })
+
         app.post('/users', async (req, res) => {
             const user = req.body
             console.log(user);
             const result = await usersCollection.insertOne(user)
             res.send(result)
+        })
+
+
+        app.get('/bookings', async (req, res) => {
+            const email = req.query.email
+            const query = { email: email }
+            const bookings = await bookingsCollection.find(query).toArray()
+            res.send(bookings)
         })
 
         app.post('/bookings', async (req, res) => {
@@ -65,6 +79,19 @@ async function run() {
             }
 
             const result = await bookingsCollection.insertOne(booking)
+            res.send(result)
+        })
+
+        app.put('/users/admin/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true }
+            const updatedDoc = {
+                $set: {
+                    role: 'admin'
+                }
+            }
+            const result = await usersCollection.updateOne(filter, updatedDoc, options)
             res.send(result)
         })
 
